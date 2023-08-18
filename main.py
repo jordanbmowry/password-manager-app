@@ -2,6 +2,42 @@ from tkinter import *
 from tkinter import messagebox
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
+import random
+import string
+import pyperclip
+
+
+def generate_password():
+    # Use the built-in string library for character lists
+    letters = string.ascii_letters
+    numbers = string.digits
+    symbols = "!@#$%^&*()-_=+[]{}|;:,.<>?/~"
+
+    # Define minimum lengths and total password length
+    MIN_LETTERS = 8
+    MIN_SYMBOLS = 2
+    MIN_NUMBERS = 2
+    TOTAL_LENGTH = random.randint(16, 20)
+
+    def generate_segment(character_set, min_length):
+        """Generate a segment of the password using the given character set and minimum length."""
+        return [random.choice(character_set) for _ in range(min_length)]
+
+    # Start with the minimum required characters
+    password_list = generate_segment(letters, MIN_LETTERS)
+    password_list += generate_segment(symbols, MIN_SYMBOLS)
+    password_list += generate_segment(numbers, MIN_NUMBERS)
+
+    # Fill in the rest of the password length with random choices from all character sets
+    for _ in range(TOTAL_LENGTH - len(password_list)):
+        password_list.append(random.choice(letters + symbols + numbers))
+
+    # Shuffle and join the password list
+    random.shuffle(password_list)
+    password = "".join(password_list)
+    password_entry.insert(0, password)
+    pyperclip.copy(password)
+    return password
 
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
@@ -56,7 +92,7 @@ password_entry = Entry(width=21)
 password_entry.grid(row=3, column=1)
 
 # Buttons
-generate_password_button = Button(text="Generate Password")
+generate_password_button = Button(text="Generate Password", command=generate_password)
 generate_password_button.grid(row=3, column=2)
 add_button = Button(text="Add", width=36, command=save)
 add_button.grid(row=4, column=1, columnspan=2)
