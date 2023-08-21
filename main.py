@@ -3,6 +3,7 @@ from tkinter import messagebox
 import random
 import string
 import pyperclip
+import json
 
 
 def generate_password():
@@ -29,7 +30,7 @@ def save():
 
     if is_input_valid(website, password):
         if show_confirmation(website, email, password):
-            append_to_data_file(website, email, password)
+            create_or_update_json_file(website, email, password)
             clear_entries()
 
 
@@ -49,9 +50,25 @@ def show_confirmation(website, email, password):
     )
 
 
-def append_to_data_file(website, email, password):
-    with open("data.txt", "a") as data_file:
-        data_file.write(f"{website} | {email} | {password}\n")
+def create_or_update_json_file(website, email, password):
+    new_data = {website: {"email": email, "password": password}}
+    try:
+        update_json_file(new_data)
+    except FileNotFoundError:
+        create_json_file(new_data)
+
+
+def update_json_file(new_data):
+    with open("data.json", "r") as data_file:
+        data = json.load(data_file)
+        data.update(new_data)
+    with open("data.json", "w") as data_file:
+        json.dump(data, data_file, indent=4)
+
+
+def create_json_file(new_data):
+    with open("data.json", "w") as data_file:
+        json.dump(new_data, data_file, indent=4)
 
 
 def clear_entries():
